@@ -5,7 +5,7 @@
 typedef struct elem{
 	int data;
 	struct elem* next;
-}node;
+}cell;
 typedef cell* list;
 
 list addToList(list a,int num){
