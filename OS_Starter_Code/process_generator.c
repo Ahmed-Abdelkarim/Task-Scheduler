@@ -82,55 +82,14 @@ void clearResources(int);
     // exit(EXIT_SUCCESS); /*can cause the function to return NULL, be careful */
 
 
-// function to send processes queue to the scheduler process
-void send_processes_queue(struct Queue processes_queue, key_t msgqid,list plist)
-{
-	int send_val;
-	struct Data processes_data;
-
-	// make sure the queue is properly set up
-	initializeQueue(processes_queue);
-
-	// read processes from Matrix
-	for (int i = 0; i < processes_count-1; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			if (j == 0)
-			{
-				processes_data.id = processes_info[i][j];
-			}
-			else if (j == 1)
-			{
-				processes_data.arrival = processes_info[i][j];
-			}
-			else if (j == 2)
-			{
-				processes_data.runtime = processes_info[i][j];
-			}
-			// insert(processes_queue, processes_data);  // not working
-		}
-		processes_queue.dataArray[processes_queue.rear] = processes_data;
-		processes_queue.rear++;
-		printf("Size of sent buffer: %d\n", size(processes_queue));
-		// (working) printf("Inserted: %d\n", processes_data.runtime);
-	}
 
 
-	printf("before sending(manual): id=%d\truntime=%d\n", processes_queue.dataArray[0].id, processes_queue.dataArray[0].runtime);
-	// printf("before sending(peek): id=%d\truntime=%d\n", peek(processes_queue).id, peek(processes_queue).runtime);
-	send_val = msgsnd(msgqid, &processes_queue, sizeof(processes_queue.dataArray), !IPC_NOWAIT);
+//ya 3bk the function below should be modified to accept list(linkedlist)
+//and send it element by element when time comes
 
-	if (send_val == -1)
-    {
-        perror("Error in send");
-    }
-    else
-    {
-        printf("\nProcesses Queue Sent\n");
-    }
 
-}
+
+
 
 // function to send process
 void send_process(int id, struct Queue prc_queue, key_t msgqid)
@@ -150,6 +109,9 @@ void send_process(int id, struct Queue prc_queue, key_t msgqid)
 		printf("Process Data Sent Successfully\n");
 	}
 }
+
+
+// what on earth is this function doing in the process generator
 
 void initiate_RR_scheduler()
 {
