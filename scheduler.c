@@ -6,15 +6,23 @@ pid_t pid;
 key_t msgqid1;
 key_t msgqid2;
 
-// function to receive the processes queue 
+struct Data
+{
+	int id;
+	int arrival;
+	int priority;
+	int runtime;
+};
+
+// function to receive the processes queue
 struct Queue recv_msg(key_t msgqid)
 {
 	int recv_val;
 	struct Queue readyQueue;
-	
-	// receive all messages 
+
+	// receive all messages
 	recv_val = msgrcv(msgqid, &readyQueue, sizeof(readyQueue.dataArray), 0, !IPC_NOWAIT);
-	
+
 	if (recv_val == -1)
 	{
 		perror("Error in receive, bad data returned");
@@ -32,10 +40,10 @@ struct Data recv_msg_process(key_t msgqid)
 {
 	int recv_val;
 	struct Data processData;
-	
+
 	// receive all messages
 	recv_val = msgrcv(msgqid, &processData, sizeof(processData), 0, !IPC_NOWAIT);
-	
+
 	if (recv_val == -1)
 	{
 		perror("Error in receive, bad data returned");
@@ -50,13 +58,13 @@ struct Data recv_msg_process(key_t msgqid)
 
 void main(int argc, char * argv[])
 {
-	
+
 	// scheduler logic
 	initClk();
 
 	//TODO implement the scheduler :)
 	//upon termination release the clock resources
-	
+
 	if (strcmp(argv[1], "-RR") == 0)
 	{
 		// printf("Test");
@@ -108,8 +116,12 @@ void main(int argc, char * argv[])
 			printf("Scheduling Logic\n");
 			int serv_status;
 			serv_pid = wait(&serv_status);
+			if (!readyQueue.isEmpty()){
+			Data processX = removeData(readyQueue);
+
+			}
 		}
 	}
-	
-	
+
+
 }
