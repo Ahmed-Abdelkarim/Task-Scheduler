@@ -2,20 +2,28 @@
 #include<stdlib.h>
 #include<stdio.h>
 
+struct Data
+{
+	int id;
+	int arrival;
+	int runtime;
+  int Priority;
+};
+
 typedef struct elem{
-	int data;
+	struct Data data;
 	struct elem* next;
 }cell;
 typedef cell* list;
 
-list addToList(list a,int num){
+list addToList(list a,struct Data daTa){
 
  list iter, temp;
  int i=0;
 
  if(a==NULL){
    a = (list)malloc(sizeof(cell));
-   a->data = num;
+   a->data = daTa;
    a->next = NULL;
  }
  else{
@@ -26,13 +34,14 @@ list addToList(list a,int num){
    }
 
    temp = (list)malloc(sizeof(cell));
-   temp->data = num;
+   temp->data = daTa;
    temp->next = NULL;
 
    iter->next = temp;
  }
  return a;
 }
+//this adds a node to the list sorted bt time
 
 list deleteFromList(list a,int pos){
 
@@ -66,13 +75,13 @@ void printList(list a){
  printf("List contains following elements : \n");
 
  while(temp!=NULL){
-   printf("%d ",temp->data);
+  // printf("%d ",temp->data->id);
    temp = temp->next;
  }
 }
 // this comment is from khairy
 //may be this main is and example to show how it works
-int main(int argC,char* argV[])
+/*int main(int argC,char* argV[])
 {
  list a = NULL;
  int i;
@@ -98,7 +107,8 @@ int main(int argC,char* argV[])
  }
  return 0;
 }
-
+*/
+/*
 //traversal
 struct link *first;
 // ...
@@ -106,3 +116,4 @@ struct link *iter;
 for(iter = first; iter != NULL; iter = iter->next) {
   // access data, e.g. with iter->data
 }
+*/

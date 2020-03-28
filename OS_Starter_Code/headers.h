@@ -12,6 +12,10 @@
 #include <signal.h>
 #include <time.h>
 #include "LinkedList.h"
+#include <string.h>
+#include <unistd.h>
+#include <ctype.h>
+
 
 typedef short bool;
 #define true 1
