@@ -2,17 +2,32 @@
 
 /* Modify this file as needed*/
 int remainingtime;
+double allocated_quanta = 0;
 
-int main(int agrc, char * argv[])
+int main(int argc, char * argv[])
 {
     initClk();
     
-    //TODO it needs to get the remaining time from somewhere
-    //remainingtime = ??;
-    while (remainingtime > 0)
+    if (argc > 1)
     {
-        // remainingtime = ??;
-    }
+		// allocated_quanta = argv[1];
+	}
+	
+	if (allocated_quanta != 0)
+	{
+		// case of RR algorithm 
+	}
+	else
+	{
+		//TODO it needs to get the remaining time from somewhere
+		remainingtime = clock();	/* number of processor ticks since
+		the begining of the process */
+		while (remainingtime > 0)
+		{
+			remainingtime = clock();
+		}
+	}
+    
     
     destroyClk(false);
     
