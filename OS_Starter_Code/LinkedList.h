@@ -68,16 +68,17 @@ list insetSorted(list a,struct Data daTa){
 		}
 		//insert anywhere else
     while(iter->next!=NULL){
-			iter = iter->next;
 
-			if(daTa.remainingT < iter->data.remainingT)
+			if(daTa.remainingT < iter->next->data.remainingT)
 			{
 				temp = (list)malloc(sizeof(cell));
 				temp->data = daTa;
-				temp->next = iter;
+				temp->next = iter->next;
+				iter->next = temp;
 				return a;
 
 			}
+			iter = iter->next;
     }
 		//insert in the end
     temp = (list)malloc(sizeof(cell));
@@ -89,29 +90,18 @@ list insetSorted(list a,struct Data daTa){
   return a;
 }
 
+//check if you should pass a data structure
+list DeqFromList(list a,struct Data *d){
 
-list deleteFromList(list a,int pos){
-
- int i=1;
- list temp,iter;
+ list iter;
 
  if(a!=NULL){
    iter = a;
-
-   if(pos==1){
      a = a->next;
      iter->next = NULL;
-     free(iter);
-   }
+     //free(iter);
+		 *d = iter->data;
 
-   else{
-     while(i++!=pos-1)
-       iter = iter->next;
-     temp = iter->next;
-     iter->next = temp->next;
-     temp->next = NULL;
-     free(temp);
-   }
  }
  return a;
 }

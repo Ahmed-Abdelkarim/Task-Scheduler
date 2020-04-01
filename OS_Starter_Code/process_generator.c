@@ -17,6 +17,12 @@ void initiate_RR_scheduler()
 	execve(s_argv[0], &s_argv[0], NULL);
 }
 
+void initiate_SRTN_scheduler()
+{
+
+    char *s_argv[] = {"./scheduler.out", "-SRTN", 0};
+	execve(s_argv[0], &s_argv[0], NULL);
+}
 void initiate_clock()
 {
     char *c_argv[] = {"./clk.out", 0};
@@ -55,104 +61,70 @@ int main(int argc, char * argv[])
         free(line);
     }
 
-    pid = getpid();
-	msgqid1 = msgget(16599, IPC_CREAT | 0644);
-	msgqid2 = msgget(165999, IPC_CREAT | 0644);
-
-    // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
-    char ch[1];
-    bool keep_going = true;
-    while (keep_going)
+    int sch_fork = fork();
+    if(sch_fork == -1)
     {
-        printf("Choose scheduler from the list below: \n1. Non-preemptive Highest Priority First (HPF) \n2. Shortest Remaining time next (SRTN) \n3. Round Robin (RR) \nyour choice: ");
+      perror("Error in initializing scheduler ..\n");
+    }
+    else if(sch_fork == 0)
+    {
+      //choose the algorithm
+      printf("Choose scheduler from the list below: \n1. Non-preemptive Highest Priority First (HPF) \n2. Shortest Remaining time next (SRTN) \n3. Round Robin (RR) \nyour choice: ");
         scanf("%s", &ch);
         if (strcmp(ch, "1") == 0)
         {
-            // HPF is selected
             printf("HPF is selected \n");
-            keep_going = false;
 
-
-            break;
         }
         else if (strcmp(ch, "2") == 0)
         {
-            // SRTN is selected
             printf("SRTN is selected \n");
-            keep_going = false;
 
-
-            break;
         }
         else if (strcmp(ch, "3") == 0)
         {
-            // RR is selected
-            keep_going = false;
+          printf("RR is selected \n");
 
-            // fork a process for the scheduler
-            int spid = fork();
-            if (spid == -1)
-            {
-				perror("Error in initializing scheduler ..\n");
-			}
-			else if (spid == 0)	// child process (scheduler)
-			{
+    }else{
+      sleep(3);
 
-				printf("Initializing Scheduler\n");
-			    int ss_pid = fork();
-			    if (ss_pid == -1)
-			    {
-			        perror("Error in initializing scheduler");
-			    }
-			    else if (ss_pid == 0)
-			    {
+
+          pid = getpid();
+      	msgqid1 = msgget(16599, IPC_CREAT | 0644);
+
+      list templist = process_list;
+      while(templist->next != NULL){
+        if(templist->data.arrival == getclk())
+        {
+          struct Data dat;
+          templist = DeqFromList(templist,*dat);
+          int send_val = msgsnd(msgqid, *dat, sizeof(dat), !IPC_NOWAIT);
+
+      	if (send_val == -1)
+      	{
+      		perror("Error in send ");
+      	}
+      	else
+      	{
+      		printf("Process Data Sent Successfully\n");
+      	}
+        }
+      }
+    }
+
 					sleep(1);
-					initiate_RR_scheduler();
-			        int sc_status;
-			        ss_pid = wait(&sc_status);
-
-
-			    }
-			    else
-			    {
-					sleep(1);
-			        // send processes info to the
-			        // scheduler process
-			        // sleep(1);
-			      //  struct Queue prc_queue;
-			       // initializeQueue(prc_queue);
-			        /* Uncomment this to send the whole processes queue */
-			        // send_processes_queue(prc_queue, msgqid2, read_processes());
-			        // printf("Queue Sent\n");
-					// send process by arrival time
-					printf("Before sending\n");
-					// printf("no. of processes: %d\n", processes_count);
-					// sleep(1);
-					printf("reading processes ... \n");
-
 			        initClk();
  	printf("Process Sent\n");
 			        int ss_status;
 			        ss_pid = wait(&ss_status);
 			        if(!(ss_status & 0x00FF))
 					 	printf("\nScheduler with pid %d terminated with exit code %d\n", ss_pid, ss_status>>8);
-			    }
-			}
-			else 	// parent process (process generator)
-			{
 			    // initiate the clock
 		        initiate_clock();
 				int status;
 				spid = wait(&status);
                 destroyClk(true);
-			}
-			break;
-        }
-        else
-        {
-            printf("Invalid Choice ... take another shot. \n");
-        }
-    }
+
 }
 
 void clearResources(int signum)

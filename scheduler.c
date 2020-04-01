@@ -1,10 +1,10 @@
 #include "headers.h"
-#include "queue.h"
-#include <string.h>
 
 pid_t pid;
 key_t msgqid1;
 key_t msgqid2;
+
+list SRTNreadyqueue;
 
 pid_t runningProcID = -1;
 // function to receive the processes queue
@@ -107,10 +107,22 @@ void main(int argc, char * argv[])
 			}
 			else if (strcmp(argv[1], "-SRTN") == 0)
 			{
-
+				int processInterTime;
+				int timeNow;
 				//SRTN algorithm
-				//fork a process for the comming data
+				// when there is a comming process
 
+				//fork a process for the comming data
+					int procVal = fork();
+					if (procVal == -1)
+					{
+						perror("Error in forking .. ");
+
+					}else if(procVal == 0)
+					{
+						// this is the child process
+					}
+					else
 				//check if there is an algorithm running
 
 					//if there is no process running run the current one
