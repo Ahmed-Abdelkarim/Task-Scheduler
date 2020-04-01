@@ -8,6 +8,7 @@ struct Data
 	int arrival;
 	int runtime;
   int Priority;
+	int remainingT;
 };
 
 typedef struct elem{
@@ -42,6 +43,52 @@ list addToList(list a,struct Data daTa){
  return a;
 }
 //this adds a node to the list sorted bt time
+
+list insetSorted(list a,struct Data daTa){
+	list iter, temp;
+  int i=0;
+
+  if(a==NULL){
+    a = (list)malloc(sizeof(cell));
+    a->data = daTa;
+    a->next = NULL;
+  }
+  else{
+    iter = a;
+		//nextIter = iter->next;
+
+		//check if to insert in the beginning
+		if(daTa.remainingT < iter->data.remainingT)
+		{
+			temp = (list)malloc(sizeof(cell));
+			temp->data = daTa;
+			temp->next = iter;
+
+			a = temp;
+		}
+		//insert anywhere else
+    while(iter->next!=NULL){
+			iter = iter->next;
+
+			if(daTa.remainingT < iter->data.remainingT)
+			{
+				temp = (list)malloc(sizeof(cell));
+				temp->data = daTa;
+				temp->next = iter;
+				return a;
+
+			}
+    }
+		//insert in the end
+    temp = (list)malloc(sizeof(cell));
+    temp->data = daTa;
+    temp->next = NULL;
+
+    iter->next = temp;
+  }
+  return a;
+}
+
 
 list deleteFromList(list a,int pos){
 

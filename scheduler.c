@@ -55,24 +55,12 @@ void main(int argc, char * argv[])
 	// scheduler logic
 	initClk();
 
-	//TODO implement the scheduler :)
-	//upon termination release the clock resources
-	// Round robin
-
-		// printf("Test");
-		// processes data
-		// struct Queue prc_queue;
-		// initializeQueue(prc_queue);
 		pid = getpid();
 		msgqid1 = msgget(16599, 0644);
 		msgqid2 = msgget(165999, 0644);
-		// RR algorithm implementation
-	    // import q param
-	    // int q = atoi(argv[2]);
+
 	    int q;
-		/* Uncomment this to receive the whole processes queue */
-		// prc_queue = recv_msg(msgqid2);
-		// receive process by process (fork a process to wait for messages)
+
 		int serv_pid = fork();
 		if (serv_pid == -1)
 		{
@@ -80,18 +68,14 @@ void main(int argc, char * argv[])
 		}
 		else if (serv_pid == 0)
 		{
-			printf("Q: ");
-			scanf("%d", &q);
-			printf("RR is selected with Q = %d\n", q);
-			initClk();
-			printf("Receiving Messages from process generator .. \n");
 			// processes data
 			struct Queue readyQueue;
 			initializeQueue(readyQueue);
-			// printf("ID: %d\tArrival:%d\tRuntime:%d\n", readyQueue.dataArray[readyQueue.front].id, readyQueue.dataArray[readyQueue.front].arrival, readyQueue.dataArray[readyQueue.front].runtime);
 			int i = readyQueue.front;
 			while (1)
 			{
+				//should we fork here in???
+
 				readyQueue.dataArray[readyQueue.rear] = recv_msg_process(msgqid1);
 				readyQueue.rear++;
 				// verify incoming data
@@ -100,6 +84,7 @@ void main(int argc, char * argv[])
 				printf("Clock Now: %d\n", getClk());
 				// i++;
 				sleep(1);
+
 			}
 			// printf("Test");
 		}
@@ -109,6 +94,14 @@ void main(int argc, char * argv[])
 			{
 				//RR algorithm
 				printf("Scheduling Logic\n");
+
+				//i just changed th position of the comming section in the code
+				printf("Q: ");
+				scanf("%d", &q);
+				printf("RR is selected with Q = %d\n", q);
+				initClk();
+				printf("Receiving Messages from process generator .. \n");
+
 				int serv_status;
 				serv_pid = wait(&serv_status);
 			}
