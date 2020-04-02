@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "headers.h"
+
 typedef struct
 {
 	int id;
@@ -5,12 +9,12 @@ typedef struct
 	int priority;
 	bool isRunning;
 	int runtime;
-} Data;
+} pData;
 
 
 
 typedef struct {
-    Data *nodes;
+    pData *nodes;
     int len;
     int size;
 } priority_heap_t;
@@ -21,10 +25,10 @@ void initializePQueue(priority_heap_t *Q){
 		Q->nodes = NULL;
 }
 
-void push (priority_heap_t *h, struct Data data) {
+void push (priority_heap_t *h, pData data) {
     if (h->len + 1 >= h->size) {
         h->size = h->size ? h->size * 2 : 4;
-        h->nodes = (Data *)realloc(h->nodes, h->size * sizeof (Data));
+        h->nodes = (pData *)realloc(h->nodes, h->size * sizeof (pData));
     }
     int i = h->len + 1;
     int j = i / 2;
@@ -40,12 +44,12 @@ void push (priority_heap_t *h, struct Data data) {
 
     h->len++;
 }
-struct Data pop (priority_heap_t *h) {
+pData pop (priority_heap_t *h) {
     int i, j, k;
     if (!h->len) {
         return;
     }
-    struct Data data;
+pData data;
     data.priority = h->nodes[1].priority;
     data.id = h->nodes[1].id;
     data.arrival = h->nodes[1].arrival;
