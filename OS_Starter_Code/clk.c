@@ -36,9 +36,11 @@ int main(int argc, char * argv[])
         perror("Error in attaching the shm in clock!");
         exit(-1);
     }
+    printf("Clock Started\n");
     *shmaddr = clk; /* initialize shared memory */
     while (1)
     {
+
         sleep(1);
         (*shmaddr)++;
     }

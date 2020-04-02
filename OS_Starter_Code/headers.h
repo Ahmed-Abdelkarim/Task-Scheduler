@@ -1,3 +1,6 @@
+#ifndef HEADER_FILE
+#define HEADER_FILE
+
 #include <stdio.h>      //if you don't use scanf/printf change this include
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -13,7 +16,7 @@
 
 typedef short bool;
 #define true 1
-#define false 1
+#define false 0
 
 #define SHKEY 300
 
@@ -65,3 +68,4 @@ void destroyClk(bool terminateAll)
         killpg(getpgrp(), SIGINT);
     }
 }
+#endif
