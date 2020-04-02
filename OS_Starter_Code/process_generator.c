@@ -79,42 +79,23 @@ int main(int argc, char * argv[])
     }
     else if(sch_fork == 0)
     {
-      //choose the algorithm
-          char ch[1];
-      printf("Choose scheduler from the list below: \n1. Non-preemptive Highest Priority First (HPF) \n2. Shortest Remaining time next (SRTN) \n3. Round Robin (RR) \nyour choice: ");
-        scanf("%s", &ch);
-        if (strcmp(ch, "1") == 0)
-        {
-            printf("HPF is selected \n");
-            initiate_HPF_scheduler();
-        }
-        else if (strcmp(ch, "2") == 0)
-        {
-            printf("SRTN is selected \n");
-            initiate_SRTN_scheduler();
-
-        }
-        else if (strcmp(ch, "3") == 0)
-        {
-          printf("RR is selected \n");
-          initiate_RR_scheduler();
-        }
 
     }else{
-      initiate_clock();
 
-      sleep(3);
 
+    //  sleep(3);
+        printf("initiating msgq\n" );
         pid = getpid();
       	msgqid = msgget(16599, IPC_CREAT | 0644);
 
       list templist = process_list;
+      if(templist == NULL){printf("templist is empty\n" );}
       while(templist->next != NULL){
         if(templist->data.arrival == getClk())
         {
-          struct Data *dat;
-          templist = DeqFromList(templist,dat);
-          int send_val = msgsnd(msgqid,dat, sizeof(dat), !IPC_NOWAIT);
+          struct Data dat;
+          templist = DeqFromList(templist,&dat);
+          int send_val = msgsnd(msgqid,&dat, sizeof(dat), !IPC_NOWAIT);
 
       	   if (send_val == -1)
       	    {
@@ -126,6 +107,7 @@ int main(int argc, char * argv[])
       	    }
         }
       }
+        initiate_clock();
     }
 					sleep(1);
           //  initClk();
