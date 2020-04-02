@@ -63,6 +63,7 @@ int main(){
   int status;
   pid = wait(&status);
   if(!(status & 0x00FF)){
+    destroyClk(true);
     exit(0);
   }
   return 0;
