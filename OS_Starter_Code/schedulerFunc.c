@@ -29,36 +29,38 @@ void  HPF() {
         pData recievedData;
 
         //Recieving Processes that are in the Message Queue
-        size_t rcv = msgrcv(msgqid1, &recievedData, sizeof(recievedData), 0, IPC_NOWAIT);
-        if (rcv == -1) {
-            //perror("Error in recieve\n");
-        }
-        else {
-            printf("Message Recieved\n");
-
-            //Forking  processes corresponding to the new Data recived
-            int cpid = fork();
-            if(cpid == -1) {
-                printf("Error in fork..\n");
-            }
-            else if(cpid == 0) {
-                //Passing the runtime to the child proccess
-                char buf[3];
-                sprintf(buf, "%d", recievedData.runtime);
-                char *argv[] = { "./process.out", buf, 0};
-                printf("process %d forked\n", getpid());
-                execve(argv[0], &argv[0], NULL);
+        while(1) {
+            size_t rcv = msgrcv(msgqid1, &recievedData, sizeof(recievedData), 0, IPC_NOWAIT);
+            if (rcv == -1) {
+                //perror("Error in recieve\n");
+                break;
             }
             else {
-                //Adding the new processes received to the ready Queue
-                recievedData.id = cpid;
-                recievedData.isRunning == false;
-                push(Q, recievedData);
-                kill(cpid, SIGSTOP);
-                printf("Process %d is in ready state\n", cpid);
+                printf("Message Recieved\n");
+
+                //Forking  processes corresponding to the new Data recived
+                int cpid = fork();
+                if(cpid == -1) {
+                    printf("Error in fork..\n");
+                }
+                else if(cpid == 0) {
+                    //Passing the runtime to the child proccess
+                    char buf[3];
+                    sprintf(buf, "%d", recievedData.runtime);
+                    char *argv[] = { "./process.out", buf, 0};
+                    printf("process %d forked\n", getpid());
+                    execve(argv[0], &argv[0], NULL);
+                }
+                else {
+                    //Adding the new processes received to the ready Queue
+                    recievedData.id = cpid;
+                    recievedData.isRunning == false;
+                    push(Q, recievedData);
+                    kill(cpid, SIGSTOP);
+                    printf("Process %d is in ready state\n", cpid);
+                }
             }
         }
-
         //If the processor is not busy and there is ready processes set the appropriate process to active
         if (Q->len != 0 && available == true) {
             runningProcess = pop(Q);
