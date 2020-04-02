@@ -1,14 +1,13 @@
 // this code is compined from rosseta code
-#include<stdlib.h>
-#include<stdio.h>
 
 struct Data
 {
 	int id;
 	int arrival;
 	int runtime;
-  int Priority;
+  int priority;
 	int remainingT;
+//	bool isRunning;
 };
 
 typedef struct elem{
@@ -44,7 +43,7 @@ list addToList(list a,struct Data daTa){
 }
 //this adds a node to the list sorted bt time
 
-list insetSorted(list a,struct Data daTa){
+list insertSorted(list a,struct Data daTa){
 	list iter, temp;
   int i=0;
 
