@@ -17,9 +17,10 @@ void cleanUpThings(int signum);
 void RR_Schedule(int * shared_quanta_memory, struct Queue * shared_processes_memory)
 {
 	// processes ready data
-	struct Queue readyQueue;
+	// struct Queue readyQueue;
 	// initializeQueue(readyQueue);
-	readyQueue.front = readyQueue.rear = 0;
+	// readyQueue.front = readyQueue.rear = 0;
+	shared_processes_memory->rear = shared_processes_memory->front = 0;
 	int q;
 	/* Uncomment this to receive the whole processes queue */
 	// prc_queue = recv_msg(msgqid2);
@@ -39,10 +40,9 @@ void RR_Schedule(int * shared_quanta_memory, struct Queue * shared_processes_mem
 		initClk();
 		printf("Receiving Messages from process generator .. \n");
 		// processes received data
-		struct Queue tempQueue;
-		initializeQueue(tempQueue);
-		shared_processes_memory->rear = shared_processes_memory->front = 0;
-		int i = tempQueue.front;
+		// struct Queue tempQueue;
+		// initializeQueue(tempQueue);
+		int i = shared_processes_memory->front;
 		while (1)
 		{
 			struct Data data;
@@ -59,7 +59,7 @@ void RR_Schedule(int * shared_quanta_memory, struct Queue * shared_processes_mem
 				i++;
 			}
 			
-			sleep(1);
+			// sleep(1);
 		}
 	}
 	else
@@ -72,171 +72,92 @@ void RR_Schedule(int * shared_quanta_memory, struct Queue * shared_processes_mem
 		
 		while (1)
 		{
-			printf("Scheduler Running .. with Q = %d\n", shared_quanta_memory[0]);
-			for (int i = readyQueue.rear; i < shared_processes_memory->rear; i++)
-			{
-				// Check to see if any processes are in the ready queue
-				readyQueue.dataArray[i] = shared_processes_memory->dataArray[i];
-				readyQueue.rear++;
-				shared_processes_memory->rear--;
-				// add its runtime to the sum 
-				total_time += readyQueue.dataArray[i].runtime;
-				printf("Process Added to Queue\n");
-			}
-			// readyQueue.rear = shared_processes_memory->rear;
-			printf("No. of processes in ready queue: %d\n", readyQueue.rear);
-			if (readyQueue.rear > 1)
-			{
-				printf("Ready Processes Count: %d\n", readyQueue.rear);
-				// new data received then reset the timer
-				waiting_interval = 0;
-				// fork a process then wait for its termination 
-				// (you should be able to detect when it will terminate
-				// (or pause)
-				
-				for (int i = 0; i < readyQueue.rear; i++)
-				{
-					// Forking a process
-					/* Check if it is new or waiting */
-					/* Add the frontier process to the processing queue */
-					currentProcessData = readyQueue.dataArray[readyQueue.front];
-					
-					// run the process for a specific quanta
-					//if (strcmp("waiting", currentProcessData.status) == 0)
-					//{
-					//	
-					//}
-					for (int j = 0; j < readyQueue.rear-1; j++)
-						{
-							readyQueue.dataArray[j] = readyQueue.dataArray[j+1];
-						}
-						readyQueue.rear--;
-						printf("Ready Queue Frontier (ID): %d\n", readyQueue.dataArray[readyQueue.front].id);
-						/* fork the process */
-						int prc_pid = fork();
-						if (prc_pid == -1)
-						{
-							perror("Could not start process ... \n");
-						}
-						else if (prc_pid == 0)
-						{
-							printf("Process %d started \n", currentProcessData.id);
-							fprintf(logFilePtr, "At time %d process %d started arr %d remain %d wait %d\n", getClk(), currentProcessData.id, currentProcessData.arrival, shared_processes_memory->dataArray[currentProcessData.id-1].runtime, getClk()-currentProcessData.last_processed);
-							// currentProcessData.status = "running";
-							strcpy(currentProcessData.status, "running");
-							alarm(shared_quanta_memory[0]);
-							char buf[3];
-							// itoa(currentProcessData.runtime, buf, 10);
-							sprintf(buf, "%d", currentProcessData.runtime);
-							char *prc_argv[] = {"./process.out", buf, 0};
-							execve(prc_argv[0], &prc_argv[0], NULL);
-						}
-						else 
-						{
-							int prc_status;
-							int prc_ret = wait(&prc_status);
-							if (prc_ret >= 0) 
-							{
-								if (WEXITSTATUS(prc_status) == 1)
-								{
-									// process terminated with pause exit code
-									/* put it at the rear of the queue */
-									fprintf(logFilePtr, "At time %d process %d started arr %d remain %d wait %d\n", getClk()-shared_quanta_memory[0], currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
-									currentProcessData.runtime = currentProcessData.runtime - shared_quanta_memory[0];
-									printf("Expected runtime for p%d: %d\n", currentProcessData.id, currentProcessData.runtime);
-									currentProcessData.last_processed = getClk();
-									readyQueue.dataArray[readyQueue.rear] = currentProcessData;
-									readyQueue.rear++;
-									// output something here to the log file
-									printf("Process %d paused \n", currentProcessData.id);
-									strcpy(currentProcessData.status, "paused");
-									fprintf(logFilePtr, "At time %d process %d paused arr %d remain %d wait %d\n", getClk(), currentProcessData.id, currentProcessData.arrival, shared_processes_memory->dataArray[currentProcessData.id-1].runtime, getClk()-currentProcessData.last_processed);
-								}
-								if (WEXITSTATUS(prc_status) == 0)
-								{
-									// process terminated with finish exit code
-									/* drop it */
-									// output something here to the log file 
-									fprintf(logFilePtr, "At time %d process %d started arr %d remain %d wait %d\n", getClk()-currentProcessData.runtime, currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
-									printf("Process %d stopped\n", currentProcessData.id);
-									currentProcessData.last_processed = getClk();
-									strcpy(currentProcessData.status, "stopped");
-									fprintf(logFilePtr, "At time %d process %d stopped arr %d remain %d wait %d\n", getClk(), currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
-								}
-							}
-						}
-						use_time = getClk();
-						// sleep(1);
-				}
-			}
-			else if (readyQueue.rear == 1)
-			{
-				// transfer the process to the processing queue
-				// and replace readyQueue process id with 0
-				// to mark the queue as empty
-				printf("Ready Processes Count: %d\n", readyQueue.rear);
-				printf("Ready Queue front: %d\n", readyQueue.front);
-				// take a process from the queue
-				currentProcessData = readyQueue.dataArray[readyQueue.front];
-				// decrease the ready processes count
-				readyQueue.rear--;
-				// verify id of the process
-				printf("Ready Queue Frontier (ID): %d\n", readyQueue.dataArray[readyQueue.front].id);
-				/* fork the process */
-				int prc_pid = fork();
-				if (prc_pid == -1)
-				{
-					perror("Could not start process ... \n");
-				}
-				else if (prc_pid == 0)
-				{
-					printf("Process %d started \n", currentProcessData.id);
-					// currentProcessData.status = "running";
-					strcpy(currentProcessData.status, "running");
-					alarm(shared_quanta_memory[0]);
-					char buf[3];
-					// itoa(currentProcessData.runtime, buf, 10);
-					sprintf(buf, "%d", currentProcessData.runtime);
-					char *prc_argv[] = {"./process.out", buf, 0};
-					execve(prc_argv[0], &prc_argv[0], NULL);
-				}
-				else 
-				{
-					int prc_status;
-					int prc_ret = wait(&prc_status);
-					if (prc_ret >= 0) 
-					{
-						if (WEXITSTATUS(prc_status) == 1)
-						{
-							// process terminated with pause exit code
-							/* put it at the rear of the queue */
-							fprintf(logFilePtr, "At time %d process %d started arr %d remain %d wait %d\n", getClk()-shared_quanta_memory[0], currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
-							currentProcessData.runtime = currentProcessData.runtime - shared_quanta_memory[0];
-							printf("Expected runtime for p%d: %d\n", currentProcessData.id, currentProcessData.runtime);
-							currentProcessData.last_processed = getClk();
-							readyQueue.dataArray[readyQueue.rear] = currentProcessData;
-							readyQueue.rear++;
-							// output something here to the log file
-							printf("Process %d paused \n", currentProcessData.id);
-							strcpy(currentProcessData.status, "paused");
-							fprintf(logFilePtr, "At time %d process %d paused arr %d remain %d wait %d\n", getClk(), currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
-						}
-						if (WEXITSTATUS(prc_status) == 0)
-						{
-							// process terminated with finish exit code
-							/* drop it */
-							// output something here to the log file 
-							fprintf(logFilePtr, "At time %d process %d started arr %d remain %d wait %d\n", getClk()-currentProcessData.runtime, currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
-							printf("Process %d stopped\n", currentProcessData.id);
-							currentProcessData.last_processed = getClk();
-							strcpy(currentProcessData.status, "stopped");
-							fprintf(logFilePtr, "At time %d process %d stopped arr %d remain %d wait %d\n", getClk(), currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
-						}
-					}
-				}
-				use_time = getClk();
-				// sleep(1);
-			}
+		    printf("Scheduler Running .. with Q = %d\n", shared_quanta_memory[0]);
+		    // readyQueue.rear = shared_processes_memory->rear;
+		    // printf("No. of processes in ready queue: %d\n", readyQueue.rear);
+		    printf("No. of processes in the shared memory: %d\n", shared_processes_memory->rear);
+		    // printf("Ready Processes Count: %d\n", readyQueue.rear);
+		    // new data received then reset the timer
+		    waiting_interval = 0;
+		    // fork a process then wait for its termination 
+		    // (you should be able to detect when it will terminate
+		    // (or pause)
+		    // Forking a process
+		    /* Check if it is new or waiting */
+		    /* Add the frontier process to the processing queue */
+		    if (shared_processes_memory->rear > 0)
+		    {
+		        currentProcessData = shared_processes_memory->dataArray[shared_processes_memory->front];
+		    
+		        // run the process for a specific quanta
+		        //if (strcmp("waiting", currentProcessData.status) == 0)
+		        //{
+		        //	
+		        //}
+		        for (int i = 0; i < shared_processes_memory->rear-1; i++)
+		        {
+			        shared_processes_memory->dataArray[i] = shared_processes_memory->dataArray[i+1];
+		        }
+		        shared_processes_memory->rear--;
+		        printf("Ready Queue Frontier (ID): %d\n", shared_processes_memory->dataArray[shared_processes_memory->front].id);
+		        /* fork the process */
+		        int prc_pid = fork();
+		        if (prc_pid == -1)
+		        {
+			        perror("Could not start process ... \n");
+		        }
+		        else if (prc_pid == 0)
+		        {
+			        printf("Process %d started \n", currentProcessData.id);
+			        fprintf(logFilePtr, "At time %d process %d started arr %d remain %d wait %d\n", getClk(), currentProcessData.id, currentProcessData.arrival, shared_processes_memory->dataArray[currentProcessData.id-1].runtime, getClk() - currentProcessData.last_processed);
+			        // currentProcessData.status = "running";
+			        strcpy(currentProcessData.status, "running");
+			        alarm(shared_quanta_memory[0]);
+			        char buf[3];
+			        // itoa(currentProcessData.runtime, buf, 10);
+			        printf("Passed Runtime: %d\n", currentProcessData.runtime);
+			        sprintf(buf, "%d", currentProcessData.runtime);
+			        char *prc_argv[] = {"./process.out", buf, 0};
+			        execve(prc_argv[0], &prc_argv[0], NULL);
+		        }
+		        else 
+		        {
+			        int prc_status;
+			        int prc_ret = wait(&prc_status);
+			        if (prc_ret >= 0) 
+			        {
+				        if (WEXITSTATUS(prc_status) == 1)
+				        {
+					        // process terminated with pause exit code
+					        /* put it at the rear of the queue */
+					        fprintf(logFilePtr, "At time %d process %d started arr %d remain %d wait %d\n", getClk()-shared_quanta_memory[0], currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
+					        currentProcessData.runtime = currentProcessData.runtime - shared_quanta_memory[0];
+					        printf("Expected runtime for p%d: %d\n", currentProcessData.id, currentProcessData.runtime);
+					        currentProcessData.last_processed = getClk();
+					        shared_processes_memory->dataArray[shared_processes_memory->rear] = currentProcessData;
+					        shared_processes_memory->rear++;
+					        // output something here to the log file
+					        printf("Process %d paused \n", currentProcessData.id);
+					        strcpy(currentProcessData.status, "paused");
+					        fprintf(logFilePtr, "At time %d process %d paused arr %d remain %d wait %d\n", getClk(), currentProcessData.id, currentProcessData.arrival, shared_processes_memory->dataArray[currentProcessData.id-1].runtime, getClk()-currentProcessData.last_processed);
+				        }
+				        if (WEXITSTATUS(prc_status) == 0)
+				        {
+					        // process terminated with finish exit code
+					        /* drop it */
+					        // output something here to the log file 
+					        fprintf(logFilePtr, "At time %d process %d started arr %d remain %d wait %d\n", getClk()-currentProcessData.runtime, currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
+					        printf("Process %d stopped\n", currentProcessData.id);
+					        currentProcessData.last_processed = getClk();
+					        strcpy(currentProcessData.status, "stopped");
+					        fprintf(logFilePtr, "At time %d process %d stopped arr %d remain %d wait %d\n", getClk(), currentProcessData.id, currentProcessData.arrival, currentProcessData.runtime, getClk()-currentProcessData.last_processed);
+				        }
+			        }
+		        }
+		        use_time = getClk();
+		        printf("Clock Now: %d\n", getClk());
+		        // sleep(1);
+		    }
 			else
 			{
 				// increment timer for exiting 
@@ -244,7 +165,6 @@ void RR_Schedule(int * shared_quanta_memory, struct Queue * shared_processes_mem
 				sleep(1);
 				// printf("Waiting ... \n");
 			}
-			printf("Clock Now: %d\n", getClk());
 			// check here to see if the scheduler waited for too long
 			// (more than 30 seconds with no incoming processes
 			if (waiting_interval >= 30)

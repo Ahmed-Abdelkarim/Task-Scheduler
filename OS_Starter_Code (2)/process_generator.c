@@ -211,7 +211,7 @@ void send_process(int id, struct Queue prc_queue, key_t msgqid)
 	}
 	else
 	{
-		printf("Process Data Sent Successfully\n");
+		// printf("Process Data Sent Successfully\n");
 	}
 }
 
@@ -350,7 +350,7 @@ int main(int argc, char * argv[])
 			    }
 			    else if (ss_pid == 0)
 			    {
-					sleep(1);
+					// sleep(1);
 					initiate_RR_scheduler();
 			    }
 			    else
@@ -379,12 +379,12 @@ int main(int argc, char * argv[])
 							// }
 							// prc_queue.rear--;
 							c++;
-							sleep(1);
+							// sleep(1);
 						}
 					}
 			        // send_process(prc_queue.front, prc_queue, msgqid1);
 			        // printf("After:	Id: %d\tRuntime: %d\tArrival: %d\n", prc_queue.dataArray[prc_queue.front].id, prc_queue.dataArray[prc_queue.front].runtime, prc_queue.dataArray[prc_queue.front].arrival);
-					printf("Process Sent\n");
+					printf("Processes Sent\n");
 			        int ss_status;
 			        ss_pid = wait(&ss_status);
 			        if(!(ss_status & 0x00FF))
