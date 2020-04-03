@@ -17,7 +17,7 @@ else if (strcmp(argv[1], "-SRTN") == 0)
   }  else {
       printf("Message Recieved\n");
     //fork a process for the comming data
-    //printf("\n %d %d\n",recievedData.arrival,recievedData.runtime );
+    printf("\n %d %d\n",recievedData.arrival,recievedData.runtime );
         int cpid = fork();
         if(cpid == -1) {
             printf("Error in fork..\n");
@@ -30,26 +30,30 @@ else if (strcmp(argv[1], "-SRTN") == 0)
             printf("process %d forked\n", getpid());
             execve(argv[0], &argv[0], NULL);
         }else {
-            recievedData.id = cpid;
+          recievedData.id = cpid;
+          recievedData.isRunning == false;
+          //push(Q, recievedData);
+          printf("Process added %d to Q\n", cpid);
+          kill(cpid, SIGSTOP);
+          printf("Process %d is in ready state\n", cpid);
+
             if (available == true)
               {
                 printf("there was no processes running so this process started\n" );
                 runningProcess.id = recievedData.id;
                 runningProcess.runtime = recievedData.runtime;
-                printf("\n data id %d\n",cpid );
+                //  printf("\n data id %d\n",cpid );
                 runningProcess.isRunning = 1;
                 available = false;
                 processInterTime = getClk();
-                recievedData.remainingT = recievedData.runtime -getClk();
-                //if it is there one running compare between the running time
-                printf("runningProcess.remainingT %d\n",recievedData.remainingT );
+                printf("process inter time %d\n",processInterTime);
                 kill(runningProcess.id,SIGCONT);
 
               }
             else {
               //if there is no process running run the current one
               //calculate the time passed in the currentProc
-              runningProcess.remainingT = runningProcess.runtime - getClk();
+              runningProcess.remainingT = runningProcess.runtime - clock()/CLOCKS_PER_SEC;
               //if it is there one running compare between the running time
               printf("runningProcess.remainingT %d\n",runningProcess.remainingT );
                 if(recievedData.remainingT < runningProcess.remainingT )
@@ -75,8 +79,8 @@ else if (strcmp(argv[1], "-SRTN") == 0)
                     //reaProc = insertSorted(reaProc,recievedData);
                     recievedData.priority = recievedData.runtime;
                     push(Q,recievedData);
-                  }
-                }
+                  }}
+}}
                 if (Q->len != 0 && available == true) {
                     printf("Condition is true\n");
                     runningProcess = pop(Q);
@@ -87,7 +91,8 @@ else if (strcmp(argv[1], "-SRTN") == 0)
                     kill(runningProcess.id, SIGCONT);
                     available = false;
                 }
+                sleep(1);
+
               }
-      }
-     }
+
    }
