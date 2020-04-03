@@ -10,10 +10,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <time.h>
+//#include "LinkedList.h"
+#include <string.h>
+#include <unistd.h>
+#include <ctype.h>
+
+
 
 typedef short bool;
 #define true 1
-#define false 1
+#define false 0
 
 #define SHKEY 300
 
