@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
-
+#include <time.h>
 typedef short bool;
 #define true 1
 #define false 0

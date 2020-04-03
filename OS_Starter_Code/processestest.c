@@ -27,7 +27,7 @@ int main(){
   }
   else if(spid == 0){
     printf("Initializing HPF Scheduler\n");
-    char *argv[] = { "./scheduler.out", "-HPF", 0};
+    char *argv[] = { "./scheduler.out", "-SRTN", 0};
     execve(argv[0], &argv[0], NULL);
   }
   else{

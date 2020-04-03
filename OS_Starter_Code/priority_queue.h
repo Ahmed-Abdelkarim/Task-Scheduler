@@ -9,6 +9,7 @@ typedef struct
 	int priority;
 	bool isRunning;
 	int runtime;
+	int remainingT;
 } pData;
 
 
